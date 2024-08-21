@@ -42,6 +42,7 @@ use App\Http\Controllers\User\CompleteController;
 use App\Http\Controllers\User\CompleteStudentController;
 use App\Http\Controllers\User\HistoryTransactionController;
 use App\Http\Controllers\User\LockHourController;
+use App\Http\Controllers\User\SearchController;
 use App\Http\Controllers\WalletController;
 //use App\Models\Wallet;
 //use Spatie\Permission\Contracts\Permission;
@@ -220,8 +221,12 @@ Route::group(['middleware' => ['localization']], function () {
                 Route::get('getAll', [RoleController::class, 'getAll']);
                 Route::get('getById/{id}', [RoleController::class, 'getById']);
             });
-            Route::post('searchName', [AdminController::class, 'searchByName']);
-            Route::post('searchAddress', [AdminController::class, 'searchByAddress']);
+        });
+
+        Route::group(['prefix' => 'search'], function () {
+            Route::post('financialReport', [SearchController::class, 'searchFinancialReport']);
+            Route::post('course', [SearchController::class, 'searchCourse']);
+            Route::post('searchAddress', [SearchController::class, 'searchByAddress']);
         });
 
         Route::group(['middleware' => ['hasRole:teacher']], function () {
