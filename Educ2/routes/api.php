@@ -448,5 +448,16 @@ Route::group(['middleware' => ['localization']], function () {
                 Route::get('Disconnect/{id}', [ChannelController::class, 'Disconnect']);
             });
         });
+
+        Route::group(['prefix' => 'search'], function () {
+            Route::post('acceptTeachers', [SearchController::class, 'acceptTeachers']);
+            Route::post('students', [SearchController::class, 'students']);
+            Route::post('employees', [SearchController::class, 'employees']);
+            Route::post('completeRequest', [SearchController::class, 'completeRequest']);
+            Route::post('ads', [SearchController::class, 'ads']);
+            Route::post('teachingMethods', [SearchController::class, 'teachingMethods']);
+            Route::post('reports', [SearchController::class, 'reports']);
+        });
+
     });
 });

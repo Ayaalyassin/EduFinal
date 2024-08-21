@@ -27,7 +27,7 @@ class TeachingMethodController extends Controller
             if (!$profile_teacher) {
                 return $this->returnError("404", 'Profile Teacher Not found');
             }
-            $teaching_methods = $profile_teacher->teaching_methods()->orderBy('created_at', 'desc')->filter($request)->get();
+            $teaching_methods = $profile_teacher->teaching_methods()->whereDoesntHave('series')->orderBy('created_at', 'desc')->filter($request)->get();
             return $this->returnData($teaching_methods, __('backend.operation completed successfully', [], app()->getLocale()));
         } catch (\Exception $ex) {
             return $this->returnError("500", $ex->getMessage());
@@ -155,7 +155,7 @@ class TeachingMethodController extends Controller
             $profile_teacher = auth()->user()->profile_teacher()->first();
             $teaching_methods = [];
             if ($profile_teacher)
-                $teaching_methods = $profile_teacher->teaching_methods()->orderBy('created_at', 'desc')->get();
+                $teaching_methods = $profile_teacher->teaching_methods()->whereDoesntHave('series')->orderBy('created_at', 'desc')->get();
 
             return $this->returnData($teaching_methods, __('backend.operation completed successfully', [], app()->getLocale()));
         } catch (\Exception $ex) {
@@ -168,7 +168,7 @@ class TeachingMethodController extends Controller
         try {
             //$teaching_methods = TeachingMethod::with('profile_teacher.user:id,name')->get();
 
-            $teaching_methods = TeachingMethod::join('profile_teachers', 'teaching_methods.profile_teacher_id', '=', 'profile_teachers.id')->join('users', 'profile_teachers.user_id', '=', 'users.id')
+            $teaching_methods = TeachingMethod::whereDoesntHave('series')->join('profile_teachers', 'teaching_methods.profile_teacher_id', '=', 'profile_teachers.id')->join('users', 'profile_teachers.user_id', '=', 'users.id')
                 ->select('teaching_methods.*', 'users.name')->orderBy('created_at', 'desc')
                 ->filter($request)->get();
 

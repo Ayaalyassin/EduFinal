@@ -12,7 +12,7 @@ class ProfileStudent extends Model
 
     protected $fillable = [
         'phone',
-        'description',
+        'educational_level',
         'user_id',
         //'assessing',
     ];

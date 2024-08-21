@@ -3,12 +3,19 @@
 namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
+use App\Models\Ads;
+use App\Models\CompleteTeacher;
 use App\Models\EmployeeReport;
 use App\Models\FinancialReport;
+use App\Models\ProfileStudent;
+use App\Models\ProfileTeacher;
 use App\Models\QualificationCourse;
 use App\Models\Report;
+use App\Models\TeachingMethod;
+use App\Models\User;
 use App\Traits\GeneralTrait;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class SearchController extends Controller
 {
@@ -87,51 +94,182 @@ class SearchController extends Controller
         return $this->returnData($courses, 200);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function acceptTeachers(Request $request)
     {
-        //
+        try {
+            DB::beginTransaction();
+
+            $search=$request->search;
+
+            $profile_teacher = ProfileTeacher::where('status',1)
+                ->with(['user','domains'])
+                ->whereDoesntHave('user.block')
+                ->where('jurisdiction', 'like', '%' . $search . '%')
+                ->orWhereHas('user',function ($query) use ($search){
+                    $query->where('name', 'like', '%' . $search . '%')
+                        ->orWhere('address', 'like', '%' . $search . '%');
+                })
+                ->get();
+
+            DB::commit();
+            return $this->returnData($profile_teacher, __('backend.operation completed successfully', [], app()->getLocale()));
+        } catch (\Exception $ex) {
+            DB::rollback();
+            return $this->returnError("500", 'Please try again later');
+        }
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function students(Request $request)
     {
-        //
+        try {
+            DB::beginTransaction();
+
+            $search=$request->search;
+
+            $profile_student = ProfileStudent::with('user')
+            ->whereDoesntHave('user.block')
+                ->where('educational_level', 'like', '%' . $search . '%')
+                ->orWhereHas('user',function ($query) use ($search){
+                    $query->where('name', 'like', '%' . $search . '%')
+                        ->orWhere('address', 'like', '%' . $search . '%');
+                })
+                ->get();
+
+            DB::commit();
+            return $this->returnData($profile_student, __('backend.operation completed successfully', [], app()->getLocale()));
+        } catch (\Exception $ex) {
+            DB::rollback();
+            return $this->returnError("500", 'Please try again later');
+        }
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function employees(Request $request)
     {
-        //
+        try {
+
+            $search=$request->search;
+
+            $data = User::with('roles'
+            )->whereHas('roles',function ($query){
+                $query->where('id',4);
+            })->where('name', 'like', '%' . $search . '%')
+                ->orWhere('address', 'like', '%' . $search . '%')
+                ->orWhere('governorate', 'like', '%' . $search . '%')
+                ->get()->map(function ($user){
+                $user->is_blocked = $user->isBlocked() ;
+                return $user;
+            });
+            return $this->returnData($data, __('backend.operation completed successfully', [], app()->getLocale()));
+        } catch (\Exception $ex) {
+            return $this->returnError($ex->getCode(),'Please try again later');
+        }
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
+    public function completeRequest(Request $request)
     {
-        //
+        try {
+            $search=$request->search;
+            $requestCompletes = CompleteTeacher::where('status', 0)->with([
+                'teacher' => function ($q) {
+                    $q->select('id', 'user_id', 'jurisdiction');
+                },
+                'teacher.user' => function ($q) {
+                    $q->select('id', 'name', 'address');
+                }
+            ])
+                ->where(function ($query) use ($search) {
+                    $query->orWhereHas('teacher', function ($q) use ($search) {
+                        $q->where('jurisdiction', 'like', '%' . $search . '%');
+                    })
+                        ->orWhereHas('teacher.user', function ($q) use ($search) {
+                            $q->where('name', 'like', '%' . $search . '%')
+                                ->orWhere('address', 'like', '%' . $search . '%');
+                        });
+                })
+                ->get();
+
+            DB::commit();
+            return $this->returnData($requestCompletes, __('backend.operation completed successfully', [], app()->getLocale()));
+        } catch (\Exception $ex) {
+            DB::rollback();
+            return $this->returnError($ex->getCode(), $ex->getMessage());
+        }
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    public function ads(Request $request)
     {
-        //
+        try {
+            $search=$request->search;
+
+            $ads = Ads::join('profile_teachers', 'ads.profile_teacher_id', '=', 'profile_teachers.id')
+                ->join('users', 'profile_teachers.user_id', '=', 'users.id')
+                ->select('ads.*', 'users.name')
+                ->where('users.name', 'like', '%' . $search . '%')
+                ->orWhere('title', 'like', '%' . $search . '%')
+                ->orWhere('price','like', '%' . $search . '%')
+                ->orWhere('place','like', '%' . $search . '%')
+                ->get();
+
+            return $this->returnData($ads, __('backend.operation completed successfully', [], app()->getLocale()));
+        } catch (\Exception $ex) {
+            return $this->returnError("500", "Please try again later");
+        }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
+    public function teachingMethods(Request $request)
     {
-        //
+        try {
+            $search=$request->search;
+
+            $teaching_methods = TeachingMethod::whereDoesntHave('series')->join('profile_teachers', 'teaching_methods.profile_teacher_id', '=', 'profile_teachers.id')
+                ->join('users', 'profile_teachers.user_id', '=', 'users.id')
+                ->select('teaching_methods.*', 'users.name')->orderBy('created_at', 'desc')
+                ->where('users.name', 'like', '%' . $search . '%')
+                ->orWhere('title', 'like', '%' . $search . '%')
+                ->orWhere('price','like', '%' . $search . '%')
+                ->get();
+
+            return $this->returnData($teaching_methods, __('backend.operation completed successfully', [], app()->getLocale()));
+        } catch (\Exception $ex) {
+            return $this->returnError("500", "Please try again later");
+        }
     }
+
+    public function reports(Request $request)
+    {
+        try {
+            DB::beginTransaction();
+
+            $search=$request->search;
+            $reports = Report::with(['reporter'=>function($query){
+                $query->select('id','user_id')
+                ->with([
+                    'user:id,name'
+                ]);
+            },'reported'=>function($query){
+                $query->select('id','user_id')
+                ->with([
+                    'user:id,name'
+                ]);
+            }])
+                ->where('reason', 'like', '%' . $search . '%')
+                ->orwhereHas('reporter.user',function($query) use ($search)
+            {
+                $query->where('name', 'like', '%' . $search . '%');
+            })
+                ->orwhereHas('reported.user',function($query) use ($search)
+                {
+                    $query->where('name', 'like', '%' . $search . '%');
+                })
+                ->orderBy('created_at','desc')->get();
+
+            DB::commit();
+            return $this->returnData($reports, __('backend.operation completed successfully', [], app()->getLocale()));
+        } catch (\Exception $ex) {
+            DB::rollback();
+            return $this->returnError("500", $ex->getMessage());
+        }
+    }
+
+
 }
