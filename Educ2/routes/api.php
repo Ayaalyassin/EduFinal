@@ -9,6 +9,7 @@ use App\Http\Controllers\CommentController;
 use App\Http\Controllers\FavouriteController;
 use App\Http\Controllers\GoogleController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\PaginateController;
 use App\Http\Controllers\PasswordController;
 //use App\Http\Controllers\ProfileStudentAdsController;
 use App\Http\Controllers\ReservationAdsController;
@@ -99,6 +100,7 @@ Route::group(['middleware' => ['localization']], function () {
             Route::group(['prefix' => 'profile_teacher'], function () {
                 Route::get('getById/{id}', [ProfileTeacherController::class, 'getById']);
                 Route::get('index', [ProfileTeacherController::class, 'index']);
+                Route::get('index/paginate', [PaginateController::class, 'profile_teacher']);
             });
         });
 
@@ -106,8 +108,10 @@ Route::group(['middleware' => ['localization']], function () {
 
             Route::group(['prefix' => 'report'], function () {
                 Route::get('getAll', [AdminController::class, 'getAllReport']);
+                Route::get('getAll/paginate', [PaginateController::class, 'getAllReport']);
                 Route::get('getById/{id}', [AdminController::class, 'getById']);
                 Route::get('financialReports', [ProfitRatioController::class, 'getFinancialReports']);
+                Route::get('financialReports/paginate', [PaginateController::class, 'getFinancialReports']);
             });
         });
         Route::group(['prefix' => 'profile_teacher'], function () {
@@ -136,6 +140,7 @@ Route::group(['middleware' => ['localization']], function () {
             Route::group(['prefix' => 'profile_student'], function () {
                 Route::get('getById/{id}', [ProfileStudentController::class, 'getById']);
                 Route::get('getAll', [ProfileStudentController::class, 'getAll']);
+                Route::get('getAll/paginate', [PaginateController::class, 'profile_student']);
             });
         });
         Route::group(['middleware' => ['hasRole:teacher']], function () {
@@ -157,6 +162,7 @@ Route::group(['middleware' => ['localization']], function () {
         Route::group(['middleware' => ['hasRole:student|admin|employee']], function () {
             Route::group(['prefix' => 'ads'], function () {
                 Route::get('getAll', [AdsController::class, 'index']);
+                Route::get('getAll/paginate', [PaginateController::class, 'ads']);
                 Route::get('getAdsTeacher/{id}', [AdsController::class, 'getAdsTeacher']);
                 Route::get('getSimilar', [AdsController::class, 'getSimilar']);
             });
@@ -165,6 +171,7 @@ Route::group(['middleware' => ['localization']], function () {
         Route::group(['middleware' => ['hasRole:admin']], function () {
             Route::group(['prefix' => 'employee'], function () {
                 Route::get('getAll', [EmployeeController::class, 'getAll']);
+                Route::get('getAll/paginate', [PaginateController::class, 'employee']);
                 Route::post('store', [EmployeeController::class, 'createEmployee']);
                 Route::post('update/{id}', [EmployeeController::class, 'updateEmployee']);
                 Route::get('getById/{id}', [EmployeeController::class, 'getById']);
@@ -208,6 +215,7 @@ Route::group(['middleware' => ['localization']], function () {
 
         Route::group(['prefix' => 'report'], function () {
             Route::get('get', [ReportController::class, 'index'])->middleware('hasRole:admin|employee');
+            Route::get('get/paginate', [PaginateController::class, 'report'])->middleware('hasRole:admin|employee');
             Route::post('report_student', [ReportController::class, 'report_student'])->middleware(['hasRole:teacher', 'profileTeacher']);;
             Route::post('report_teacher', [ReportController::class, 'report_teacher'])->middleware(['hasRole:student', 'profileStudent']);
         });
@@ -256,6 +264,7 @@ Route::group(['middleware' => ['localization']], function () {
         Route::group(['middleware' => ['hasRole:admin|employee']], function () {
             Route::group(['prefix' => 'TeachingMethod'], function () {
                 Route::get('getAll', [TeachingMethodController::class, 'getAll']);
+                Route::get('getAll/paginate', [PaginateController::class, 'TeachingMethod']);
                 Route::delete('deleteForAdmin/{id}', [TeachingMethodController::class, 'deleteForAdmin']);
             });
         });
@@ -281,13 +290,18 @@ Route::group(['middleware' => ['localization']], function () {
 
             Route::group(['middleware' => ['hasRole:admin|employee']], function () {
                 Route::get('get-request-charge-student', [GovernorController::class, 'get_request_charge_student']);
+                Route::get('get-request-charge-student/paginate', [PaginateController::class, 'get_request_charge_student']);
                 Route::get('get-request-charge-teacher', [GovernorController::class, 'get_request_charge_teacher']);
+                Route::get('get-request-charge-teacher/paginate', [PaginateController::class, 'get_request_charge_teacher']);
                 Route::get('get-request-recharge-student', [GovernorController::class, 'get_request_recharge_student']);
+                Route::get('get-request-recharge-student/paginate', [PaginateController::class, 'get_request_recharge_student']);
                 Route::get('get-request-recharge-teacher', [GovernorController::class, 'get_request_recharge_teacher']);
+                Route::get('get-request-recharge-teacher/paginate', [PaginateController::class, 'get_request_recharge_teacher']);
                 Route::post('delete-request/{id}', [GovernorController::class, 'destroy']);
                 Route::get('accept_request_charge/{id}', [GovernorController::class, 'accept_request_charge']);
                 Route::get('accept_request_recharge/{id}', [GovernorController::class, 'accept_request_recharge']);
                 Route::get('history_transaction', [HistoryTransactionController::class, 'index']);
+                Route::get('history_transaction/paginate', [PaginateController::class, 'history_transaction']);
             });
             Route::group(['middleware' => ['hasRole:student|teacher']], function () {
                 Route::post('add-request-charge', [GovernorController::class, 'addRequestCharge']);
@@ -307,6 +321,7 @@ Route::group(['middleware' => ['localization']], function () {
             });
             Route::group(['middleware' => ['hasRole:admin|employee']], function () {
                 Route::get('get', [CompleteTeacherController::class, 'index']);
+                Route::get('get/paginate', [PaginateController::class, 'request_complete']);
                 Route::post('delete-request-complete/{id}', [CompleteTeacherController::class, 'destroy']);
                 Route::get('accept-request-complete-teacher/{id}', [CompleteTeacherController::class, 'accept_request_complete_teacher']);
             });
@@ -315,6 +330,7 @@ Route::group(['middleware' => ['localization']], function () {
         // Admin khader
         Route::group(['prefix' => 'request-join', 'middleware' => ['hasRole:admin|employee']], function () {
             Route::get('get', [AdminController::class, 'index']);
+            Route::get('get/paginate', [PaginateController::class, 'request_join']);
             Route::post('delete-request-join/{id}', [AdminController::class, 'destroy']);
             Route::get('accept-request-join/{id}', [AdminController::class, 'accept_request_teacher']);
             // Route::get('count-teacher', [AdminController::class, 'count_teacher']);
