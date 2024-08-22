@@ -455,6 +455,7 @@ Route::group(['middleware' => ['localization']], function () {
                 Route::get('getByIdSeries/{id}', [ReservationSeriesController::class, 'getByIdSeries']);
                 Route::get('getSeriesForTeaching/{id}', [ReservationSeriesController::class, 'getSeriesForTeaching']);
                 Route::get('getAll/{id}', [SeriesController::class, 'index']);
+                Route::get('getAll', [SeriesController::class, 'getAll']);
             });
         });
 

@@ -6,6 +6,7 @@ use App\Http\Requests\SeriesRequest;
 use App\Http\Requests\UpdateSeriesRequest;
 use App\Models\ProfileTeacher;
 use App\Models\Series;
+use App\Models\TeachingMethod;
 use App\Traits\GeneralTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -176,6 +177,21 @@ class SeriesController extends Controller
 
         } catch (\Exception $ex) {
             return $this->returnError("500", $ex->getMessage());
+        }
+    }
+
+
+    public function getAll()
+    {
+        try {
+
+            $teaching_methods = TeachingMethod::whereHas('series')->join('profile_teachers', 'teaching_methods.profile_teacher_id', '=', 'profile_teachers.id')->join('users', 'profile_teachers.user_id', '=', 'users.id')
+                ->select('teaching_methods.*', 'users.name')->orderBy('created_at', 'desc')
+                ->get();
+
+            return $this->returnData($teaching_methods, __('backend.operation completed successfully', [], app()->getLocale()));
+        } catch (\Exception $ex) {
+            return $this->returnError("500", "Please try again later");
         }
     }
 }
