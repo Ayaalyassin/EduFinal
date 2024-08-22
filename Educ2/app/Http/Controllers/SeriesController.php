@@ -184,7 +184,6 @@ class SeriesController extends Controller
     public function getAll()
     {
         try {
-
             $teaching_methods = TeachingMethod::whereHas('series')->join('profile_teachers', 'teaching_methods.profile_teacher_id', '=', 'profile_teachers.id')->join('users', 'profile_teachers.user_id', '=', 'users.id')
                 ->select('teaching_methods.*', 'users.name')->orderBy('created_at', 'desc')
                 ->get();
@@ -192,6 +191,39 @@ class SeriesController extends Controller
             return $this->returnData($teaching_methods, __('backend.operation completed successfully', [], app()->getLocale()));
         } catch (\Exception $ex) {
             return $this->returnError("500", "Please try again later");
+        }
+    }
+
+    public function deleteForAdmin($id)
+    {
+        try {
+            DB::beginTransaction();
+            $series=Series::where('id',$id)->first();
+            if (!$series)
+                return $this->returnError("404",'series Not found');
+
+            $this->deleteImage($series->file);
+            $series->delete();
+            DB::commit();
+            return $this->returnSuccessMessage(__('backend.operation completed successfully', [], app()->getLocale()));
+        } catch (\Exception $ex) {
+            DB::rollback();
+            return $this->returnError("500", 'Please try again later');
+        }
+    }
+
+    public function getSeriesForTeachingA($id)
+    {
+        try {
+            $teaching_method =TeachingMethod::find($id);
+            if(!$teaching_method)
+                return $this->returnError("404",'Not found');
+            $teaching_method->loadMissing('series');
+
+            return $this->returnData($teaching_method, __('backend.operation completed successfully', [], app()->getLocale()));
+
+        } catch (\Exception $ex) {
+            return $this->returnError("500", $ex->getMessage());
         }
     }
 }

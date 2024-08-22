@@ -21,7 +21,7 @@ class UpdateProfileTeacherRequest extends FormRequest
     {
         return [
             'certificate' => 'sometimes|image|mimes:jpeg,jpg,png,gif',
-            'description' => 'sometimes|string',
+            'description' => 'sometimes',
             'jurisdiction' => 'sometimes|string',
             'image' => 'sometimes|image|mimes:jpeg,jpg,png,gif',
             'address'=>'sometimes|string',

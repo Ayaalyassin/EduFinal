@@ -16,7 +16,7 @@ return new class extends Migration
             $table->bigInteger('user_id')->unsigned();
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->string('certificate'); // صورة الشهادة
-            $table->string('description');
+            $table->text('description');
             $table->string('jurisdiction'); //الاختصاص من المفاضلة
             //$table->string('domain');  // مجال العمل
             $table->boolean('status');// الاستاذ مقبول في المنصة أو قيد الانتظار

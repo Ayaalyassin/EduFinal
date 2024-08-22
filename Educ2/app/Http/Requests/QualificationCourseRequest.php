@@ -27,13 +27,13 @@ class QualificationCourseRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|string',
-            'description' => 'required|string',
-            'date' => 'required|date|after:today',
-            'end_date' => 'required|date|after:start_date',
-            'count_subscribers' => 'required|integer',
-            'price' => 'required|integer',
-            'place' => 'required|string',
+            'name' => 'sometimes|string',
+            'description' => 'sometimes',
+            'date' => 'sometimes|date|after:today',
+            'end_date' => 'sometimes|date|after:start_date',
+            'count_subscribers' => 'sometimes|integer',
+            'price' => 'sometimes|integer',
+            'place' => 'sometimes|string',
         ];
     }
 

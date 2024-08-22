@@ -439,6 +439,12 @@ Route::group(['middleware' => ['localization']], function () {
         });
 
         Route::group(['prefix' => 'series'], function () {
+            Route::get('getAll', [SeriesController::class, 'getAll']);
+
+            Route::group(['middleware' => ['hasRole:admin']], function () {
+                Route::delete("deleteForAdmin/{id}", [SeriesController::class, 'deleteForAdmin']);
+                Route::get('getSeriesForTeachingA/{id}', [SeriesController::class, 'getSeriesForTeachingA']);
+            });
             Route::group(['middleware' => ['hasRole:teacher', 'profileTeacher']], function () {
                 Route::post('store', [SeriesController::class, 'store']);
                 Route::post('update/{id}', [SeriesController::class, 'update']);
@@ -455,7 +461,6 @@ Route::group(['middleware' => ['localization']], function () {
                 Route::get('getByIdSeries/{id}', [ReservationSeriesController::class, 'getByIdSeries']);
                 Route::get('getSeriesForTeaching/{id}', [ReservationSeriesController::class, 'getSeriesForTeaching']);
                 Route::get('getAll/{id}', [SeriesController::class, 'index']);
-                Route::get('getAll', [SeriesController::class, 'getAll']);
             });
         });
 
