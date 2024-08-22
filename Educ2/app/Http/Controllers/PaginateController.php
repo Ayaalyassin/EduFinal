@@ -22,25 +22,25 @@ class PaginateController extends Controller
 {
     use GeneralTrait;
     public function profile_teacher()
-      {
-          try {
-              DB::beginTransaction();
-              $user=auth()->user();
+    {
+        try {
+            DB::beginTransaction();
+            $user = auth()->user();
 
-              $profile_teacher = ProfileTeacher::where('status',1)
-                  ->whereDoesntHave('user.block')
-                  ->orderByRaw("CASE WHEN (SELECT governorate FROM users WHERE users.id = profile_teachers.user_id) = '{$user->governorate}' THEN 0 ELSE 1 END")
-                  ->paginate(10);
+            $profile_teacher = ProfileTeacher::where('status', 1)
+                ->whereDoesntHave('user.block')
+                ->orderByRaw("CASE WHEN (SELECT governorate FROM users WHERE users.id = profile_teachers.user_id) = '{$user->governorate}' THEN 0 ELSE 1 END")
+                ->paginate(10);
 
-              $profile_teacher->loadMissing(['user','domains']);
+            $profile_teacher->loadMissing(['user', 'domains']);
 
-              DB::commit();
-              return $this->returnData($profile_teacher, __('backend.operation completed successfully', [], app()->getLocale()));
-          } catch (\Exception $ex) {
-              DB::rollback();
-              return $this->returnError("500", 'Please try again later');
-          }
-      }
+            DB::commit();
+            return $this->returnData($profile_teacher, __('backend.operation completed successfully', [], app()->getLocale()));
+        } catch (\Exception $ex) {
+            DB::rollback();
+            return $this->returnError("500", 'Please try again later');
+        }
+    }
 
 
     public function getAllReport()
@@ -69,7 +69,6 @@ class PaginateController extends Controller
             DB::rollback();
             return $this->returnError($ex->getCode(), $ex->getMessage());
         }
-
     }
 
     public function profile_student()
@@ -120,7 +119,7 @@ class PaginateController extends Controller
             });
             return $this->returnData($data, __('backend.operation completed successfully', [], app()->getLocale()));
         } catch (\Exception $ex) {
-            return $this->returnError($ex->getCode(),'Please try again later');
+            return $this->returnError($ex->getCode(), 'Please try again later');
         }
     }
 
@@ -128,17 +127,17 @@ class PaginateController extends Controller
     {
         try {
             DB::beginTransaction();
-            $reports = Report::with(['reporter'=>function($query){
-                $query->select('id','user_id');
+            $reports = Report::with(['reporter' => function ($query) {
+                $query->select('id', 'user_id');
                 $query->with([
                     'user:id,name'
                 ]);
-            },'reported'=>function($query){
-                $query->select('id','user_id');
+            }, 'reported' => function ($query) {
+                $query->select('id', 'user_id');
                 $query->with([
                     'user:id,name'
                 ]);
-            }])->orderBy('created_at','desc')->paginate(10);
+            }])->orderBy('created_at', 'desc')->paginate(10);
 
             DB::commit();
             return $this->returnData($reports, __('backend.operation completed successfully', [], app()->getLocale()));
@@ -349,5 +348,4 @@ class PaginateController extends Controller
             return $this->returnError($ex->getCode(), $ex->getMessage());
         }
     }
-
 }
