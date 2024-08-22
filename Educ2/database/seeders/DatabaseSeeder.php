@@ -5,7 +5,6 @@ namespace Database\Seeders;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use App\Models\ProfileStudent;
 use App\Models\User;
-use Database\Factories\ProfileStudentFactory;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
