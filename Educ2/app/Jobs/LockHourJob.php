@@ -27,7 +27,7 @@ class LockHourJob implements ShouldQueue
     public function handle(): void
     {
         $service=ServiceTeacher::find($this->service_id);
-        $profile=$service->profile_teacher->first();
+        $profile=$service->profile_teacher;
         $this->send($profile->user,$this->title,$this->body);
     }
 }

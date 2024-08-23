@@ -4,13 +4,16 @@ namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\LockHourRequest;
+use App\Http\Requests\LockHourRequestStore;
 use App\Jobs\LockHourJob;
 use App\Jobs\NotificationJobProfile;
+use App\Jobs\NotificationJobUser;
 use App\Models\CalendarHour;
 use App\Models\FinancialReport;
 use App\Models\HistoryLockHours;
 use App\Models\LockHour;
 use App\Models\ProfitRatio;
+use App\Models\ServiceTeacher;
 use App\Models\User;
 use App\Traits\GeneralTrait;
 use Carbon\Carbon;
@@ -95,7 +98,7 @@ class LockHourController extends Controller
         }
     }
 
-    public function store(LockHourRequest $request)
+    public function store(LockHourRequestStore $request)
     {
         try {
             $user = Auth::user();
@@ -111,6 +114,7 @@ class LockHourController extends Controller
                 ->where('hour_id', $request->hour_id)
                 ->where('date', $request->date)
                 ->first();
+
 
             if ($existingLock) {
                 return $this->returnError(400, __('backend.already request hour lock', [], app()->getLocale()));
@@ -143,7 +147,9 @@ class LockHourController extends Controller
                         ]);
                     }
 
-                    LockHourJob::dispatch($request->service_id, 'طلب حجز موعد', $user->name . ' تم طلب حجز موعد من قبل ')->delay(Carbon::now()->addSeconds(2));
+                    $service=ServiceTeacher::find($request->service_id);
+
+                    NotificationJobProfile::dispatch($service->profile_teacher, 'طلب حجز موعد', $user->name . ' تم طلب حجز موعد من قبل ')->delay(Carbon::now()->addSeconds(2));
 
                     return $this->returnData(200, __('backend.operation completed successfully', [], app()->getLocale()));
                 }

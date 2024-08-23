@@ -7,7 +7,7 @@ use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-class LockHourRequest extends FormRequest
+class LockHourRequestStore extends FormRequest
 {
     use GeneralTrait;
     /**
