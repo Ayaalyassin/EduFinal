@@ -27,7 +27,7 @@ class TeachingMethodController extends Controller
             if (!$profile_teacher) {
                 return $this->returnError("404", 'Profile Teacher Not found');
             }
-            $teaching_methods = $profile_teacher->teaching_methods()->whereDoesntHave('series')->orderBy('created_at', 'desc')->filter($request)->get();
+            $teaching_methods = $profile_teacher->teaching_methods()->whereDoesntHave('profile_teacher.user.block')->whereDoesntHave('series')->orderBy('created_at', 'desc')->filter($request)->get();
             return $this->returnData($teaching_methods, __('backend.operation completed successfully', [], app()->getLocale()));
         } catch (\Exception $ex) {
             return $this->returnError("500", $ex->getMessage());

@@ -57,13 +57,18 @@ class ReservationTeachingMethodController extends Controller
                     'value' => $user->wallet->value - $teaching_method->price
                 ]);
                 $user->wallet->save();
+                $profile_teacher=$teaching_method->profile_teacher()->first();
+                $user=$profile_teacher->user()->first();
+                $wallet=$user->wallet()->first();
+                $wallet->update([
+                    'value'=>$wallet->value+$teaching_method->price
+                ]);
             }
 
             $reservation_teaching_methods = $profile_student->reservation_teaching_methods()->create([
                 'teaching_method_id' => $request->teaching_method_id,
                 'reserved_at' => Carbon::now()->format('Y-m-d H:i:s')
             ]);
-            //AddWalletTeacherJob::dispatch($teaching_method->id,$user)->delay(Carbon::now()->addSeconds(2));
 
             NotificationJobProfile::dispatch($teaching_method->profile_teacher, ' تم شراء وسيلة تعليمية', $user->name.' من قبل '.$teaching_method->title.' تم شراء الوسيلة ')->delay(Carbon::now()->addSeconds(2));
             DB::commit();

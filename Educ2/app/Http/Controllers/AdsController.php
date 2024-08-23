@@ -30,14 +30,15 @@ class AdsController extends Controller
         return $this->returnData($desiredData, __('backend.operation completed successfully', [], app()->getLocale()));
     }
 
-    public function index(Request $request)
+    public function index()
     {
         try {
             $user = auth()->user();
 
-            $ads = Ads::orderByRaw("CASE WHEN place = '{$user->governorate}' THEN 0 ELSE 1 END, created_at DESC")->join('profile_teachers', 'ads.profile_teacher_id', '=', 'profile_teachers.id')->join('users', 'profile_teachers.user_id', '=', 'users.id')
+            $ads = Ads::whereDoesntHave('profile_teacher.user.block')->orderByRaw("CASE WHEN place = '{$user->governorate}' THEN 0 ELSE 1 END, created_at DESC")
+            ->join('profile_teachers', 'ads.profile_teacher_id', '=', 'profile_teachers.id')
+                ->join('users', 'profile_teachers.user_id', '=', 'users.id')
                 ->select('ads.*', 'users.name')
-                ->filter($request)
                 ->get();
 
             return $this->returnData($ads, __('backend.operation completed successfully', [], app()->getLocale()));

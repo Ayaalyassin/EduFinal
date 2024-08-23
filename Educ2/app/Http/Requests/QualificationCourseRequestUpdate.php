@@ -7,9 +7,8 @@ use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-class QualificationCourseRequest extends FormRequest
+class QualificationCourseRequestUpdate extends FormRequest
 {
-
     use GeneralTrait;
     /**
      * Determine if the user is authorized to make this request.
@@ -27,13 +26,13 @@ class QualificationCourseRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|string',
-            'description' => 'required',
-            'date' => 'required|date|after:today',
-            'end_date' => 'required|date|after:start_date',
-            'count_subscribers' => 'required|integer',
-            'price' => 'required|integer',
-            'place' => 'required|string',
+            'name' => 'sometimes|string',
+            'description' => 'sometimes',
+            'date' => 'sometimes|date|after:today',
+            'end_date' => 'sometimes|date|after:start_date',
+            'count_subscribers' => 'sometimes|integer',
+            'price' => 'sometimes|integer',
+            'place' => 'sometimes|string',
         ];
     }
 

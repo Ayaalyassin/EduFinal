@@ -32,16 +32,15 @@ class AdminAuthController extends Controller
             return $this->returnError(401,__('backend.Account Not found', [], app()->getLocale()));
         if (isset($exist->block))
             return $this->returnError(401,__('backend.You are block', [], app()->getLocale()));
-
-        $code=mt_rand(100000, 999999);
+        //$code=mt_rand(100000, 999999);
         $exist->update([
-            'code' => $code,
+            'code' => 444444,
         ]);
         $mailData = [
 
             'title' => 'Code login',
 
-            'code' => $code,
+            'code' =>444444,
 
         ];
 

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\QualificationCourseRequestUpdate;
 use App\Models\QualificationCourse;
 use Illuminate\Http\Request;
 use App\Traits\GeneralTrait;
@@ -125,7 +126,7 @@ class QualificationCourseController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(QualificationCourseRequest $request, $id)
+    public function update(QualificationCourseRequestUpdate $request, $id)
     {
         try {
             DB::beginTransaction();

@@ -24,7 +24,8 @@ class NoteController extends Controller
             $profile_students=[];
             if(count($users_name)>0) {
                 $profile_students = ProfileStudent::whereHas('user', function ($query) use ($users_name) {
-                    $query->whereIn('name', $users_name);
+                    $query->whereIn('name', $users_name)
+                    ->whereDoesntHave('block');
                 })
                     ->with(['user'=> function ($query){
                         $query->select('id','name');

@@ -23,8 +23,9 @@ class SeriesController extends Controller
             if (!$profile_teacher) {
                 return $this->returnError("404",'Profile Teacher Not found');
             }
-            $teaching_methods=$profile_teacher->teaching_methods()->whereHas('series')->orderBy('created_at','desc')->get();
-            //$teaching_methods->loadMissing('series');
+            $teaching_methods=$profile_teacher->teaching_methods()->whereDoesntHave('profile_teacher.user.block')
+                ->whereHas('series')->orderBy('created_at','desc')->get();
+
             return $this->returnData($teaching_methods, __('backend.operation completed successfully', [], app()->getLocale()));
         } catch (\Exception $ex) {
             return $this->returnError("500",$ex->getMessage());
