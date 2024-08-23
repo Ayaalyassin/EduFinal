@@ -441,7 +441,7 @@ Route::group(['middleware' => ['localization']], function () {
         Route::group(['prefix' => 'series'], function () {
             Route::get('getAll', [SeriesController::class, 'getAll']);
 
-            Route::group(['middleware' => ['hasRole:admin']], function () {
+            Route::group(['middleware' => ['hasRole:admin|employee']], function () {
                 Route::delete("deleteForAdmin/{id}", [SeriesController::class, 'deleteForAdmin']);
                 Route::get('getSeriesForTeachingA/{id}', [SeriesController::class, 'getSeriesForTeachingA']);
             });
@@ -479,6 +479,8 @@ Route::group(['middleware' => ['localization']], function () {
             Route::post('ads', [SearchController::class, 'ads']);
             Route::post('teachingMethods', [SearchController::class, 'teachingMethods']);
             Route::post('reports', [SearchController::class, 'reports']);
+            Route::post('request_join', [SearchController::class, 'request_join']);
+
         });
 
     });

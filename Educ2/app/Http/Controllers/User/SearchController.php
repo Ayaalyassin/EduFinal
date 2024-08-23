@@ -107,7 +107,7 @@ class SearchController extends Controller
                 ->where('jurisdiction', 'like', '%' . $search . '%')
                 ->orWhereHas('user',function ($query) use ($search){
                     $query->where('name', 'like', '%' . $search . '%')
-                        ->orWhere('address', 'like', '%' . $search . '%');
+                        ->orWhere('governorate', 'like', '%' . $search . '%');
                 })
                 ->get();
 
@@ -131,7 +131,7 @@ class SearchController extends Controller
                 ->where('educational_level', 'like', '%' . $search . '%')
                 ->orWhereHas('user',function ($query) use ($search){
                     $query->where('name', 'like', '%' . $search . '%')
-                        ->orWhere('address', 'like', '%' . $search . '%');
+                        ->orWhere('governorate', 'like', '%' . $search . '%');
                 })
                 ->get();
 
@@ -149,16 +149,20 @@ class SearchController extends Controller
 
             $search=$request->search;
 
-            $data = User::with('roles'
-            )->whereHas('roles',function ($query){
-                $query->where('id',4);
-            })->where('name', 'like', '%' . $search . '%')
-                ->orWhere('address', 'like', '%' . $search . '%')
-                ->orWhere('governorate', 'like', '%' . $search . '%')
-                ->get()->map(function ($user){
-                $user->is_blocked = $user->isBlocked() ;
-                return $user;
-            });
+            $data = User::with('roles')
+                ->whereHas('roles', function ($query) {
+                    $query->where('id', 4);
+                })
+                ->where(function ($query) use ($search) {
+                    $query->where('name', 'like', '%' . $search . '%')
+                        ->orWhere('address', 'like', '%' . $search . '%')
+                        ->orWhere('governorate', 'like', '%' . $search . '%');
+                })
+                ->get()
+                ->map(function ($user) {
+                    $user->is_blocked = $user->isBlocked();
+                    return $user;
+                });
             return $this->returnData($data, __('backend.operation completed successfully', [], app()->getLocale()));
         } catch (\Exception $ex) {
             return $this->returnError($ex->getCode(),'Please try again later');
@@ -183,7 +187,7 @@ class SearchController extends Controller
                     })
                         ->orWhereHas('teacher.user', function ($q) use ($search) {
                             $q->where('name', 'like', '%' . $search . '%')
-                                ->orWhere('address', 'like', '%' . $search . '%');
+                                ->orWhere('governorate', 'like', '%' . $search . '%');
                         });
                 })
                 ->get();
@@ -269,6 +273,26 @@ class SearchController extends Controller
             DB::rollback();
             return $this->returnError("500", $ex->getMessage());
         }
+    }
+
+    public function request_join(Request $request)
+    {
+        try {
+            DB::beginTransaction();
+            $search=$request->search;
+            $teacher = ProfileTeacher::with('user')->with('domains')->where('status', 0)
+                ->where('jurisdiction', 'like', '%' . $search . '%')
+                ->orwhereHas('user',function($query) use ($search){
+                    $query->where('name', 'like', '%' . $search . '%')
+                    ->orWhere('governorate', 'like', '%' . $search . '%');
+                })->get();
+            DB::commit();
+            return $this->returnData($teacher, 200);
+        } catch (\Exception $ex) {
+            DB::rollback();
+            return $this->returnError($ex->getCode(), $ex->getMessage());
+        }
+
     }
 
 

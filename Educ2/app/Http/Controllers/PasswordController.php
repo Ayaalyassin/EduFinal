@@ -53,8 +53,8 @@ class PasswordController extends Controller
                 ];
 
 //                ForgetPasswordJob::dispatch($mailData,$user)->delay(Carbon::now()->addSeconds(2));
-                //Mail::to($user->email)->send(new ForgetPasswordMail($mailData));
-                //DeleteCodeJob::dispatch($this->exist)->delay(Carbon::now()->addMinutes(2));
+                Mail::to($user->email)->send(new ForgetPasswordMail($mailData));
+                DeleteCodeJob::dispatch($user)->delay(Carbon::now()->addMinutes(6));
                 return $this->returnSuccessMessage(__('backend.operation completed successfully', [], app()->getLocale()));
             }
             else
