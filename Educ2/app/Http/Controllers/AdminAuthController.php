@@ -22,7 +22,9 @@ class AdminAuthController extends Controller
     {
         $credentials = $request->only(['email', 'password']);
         $token = JWTAuth::attempt($credentials);
-        $exist=User::where('email',$request->email)->first();
+        $exist=User::where('email',$request->email)->whereHas('roles',function ($q){
+            $q->where('id',3)->orWhere('id',4);
+        })->first();
         if($exist && !$token)
             return $this->returnError(401,__('backend.The password is wrong', [], app()->getLocale()));
 
@@ -43,9 +45,8 @@ class AdminAuthController extends Controller
 
         ];
 
-        //Mail::to($exist->email)->send(new CodeEmail($mailData));
-        //sendCodeEmailJob::dispatch($mailData,$exist)->delay(Carbon::now()->addSeconds(2));
-        //DeleteCodeJob::dispatch($exist)->delay(Carbon::now()->addMinutes(6));
+        Mail::to($exist->email)->send(new CodeEmail($mailData));
+        DeleteCodeJob::dispatch($exist)->delay(Carbon::now()->addMinutes(6));
         return $this->returnSuccessMessage(__('backend.code send successfully', [], app()->getLocale()));
     }
 
@@ -79,22 +80,5 @@ class AdminAuthController extends Controller
 
     }
 
-    public function test()
-    {
-        $exist=auth()->user();
-        $code=mt_rand(100000, 999999);
-        $exist->update([
-            'code' => $code,
-        ]);
-        $mailData = [
-
-            'title' => 'Code login',
-
-            'code' => $code
-
-        ];
-        Mail::to($exist->email)->send(new CodeEmail($mailData));
-        DeleteCodeJob::dispatch($exist)->delay(Carbon::now()->addMinutes(2));
-    }
 
 }

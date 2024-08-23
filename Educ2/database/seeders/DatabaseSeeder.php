@@ -27,9 +27,9 @@ class DatabaseSeeder extends Seeder
         $this->call(AdminSeed::class);
         $this->call(ChannelSeeder::class);
         $this->call(ProfitRatiosSeeder::class);
-        User::factory()
-            ->count(100)
-            ->has(ProfileStudent::factory()->count(1), 'profile_student')
-            ->create();
+//        User::factory()
+//            ->count(100)
+//            ->has(ProfileStudent::factory()->count(1), 'profile_student')
+//            ->create();
     }
 }
