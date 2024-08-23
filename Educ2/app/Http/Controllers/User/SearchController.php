@@ -24,9 +24,7 @@ class SearchController extends Controller
     public function searchFinancialReport(Request $request)
     {
         $searchTerm = $request->input('search');
-        if (!$searchTerm) {
-            return  $this->returnError(500, 'Please provide a search term');
-        }
+
         $searchTerms = explode(' ', $searchTerm);
         $financialReportsQuery = FinancialReport::query();
         foreach ($searchTerms as $term) {
@@ -39,9 +37,7 @@ class SearchController extends Controller
             });
         }
         $financialReports = $financialReportsQuery->get();
-        if ($financialReports->isEmpty()) {
-            return $this->returnError(404, 'No financial reports found matching the search term');
-        }
+
         return $this->returnData($financialReports, 200);
     }
 
@@ -49,9 +45,7 @@ class SearchController extends Controller
     public function searchReport(Request $request)
     {
         $searchTerm = $request->input('search');
-        if (!$searchTerm) {
-            return  $this->returnError(500, 'Please provide a search term');
-        }
+
         $searchTerms = explode(' ', $searchTerm);
         $reportsQuery = EmployeeReport::query();
         foreach ($searchTerms as $term) {
@@ -63,9 +57,7 @@ class SearchController extends Controller
             });
         }
         $reports = $reportsQuery->get();
-        if ($reports->isEmpty()) {
-            return $this->returnError(404, 'No reports found matching the search term');
-        }
+
         return $this->returnData($reports, 200);
     }
 
@@ -73,9 +65,7 @@ class SearchController extends Controller
     public function searchCourse(Request $request)
     {
         $searchTerm = $request->input('search');
-        if (!$searchTerm) {
-            return  $this->returnError(400, 'Please provide a search term');
-        }
+
         $searchTerms = explode(' ', $searchTerm);
         $coursesQuery = QualificationCourse::query();
         foreach ($searchTerms as $term) {
@@ -88,9 +78,7 @@ class SearchController extends Controller
             });
         }
         $courses = $coursesQuery->get();
-        if ($courses->isEmpty()) {
-            return  $this->returnError(404, 'No course found matching the search term');
-        }
+
         return $this->returnData($courses, 200);
     }
 
