@@ -7,7 +7,6 @@ use App\Http\Requests\EmailRequest;
 use App\Http\Requests\PasswordNewRequest;
 use App\Http\Requests\ResetPasswordRequest;
 use App\Jobs\DeleteCodeJob;
-use App\Mail\ForgetPasswordMail;
 use App\Models\User;
 use App\Traits\GeneralTrait;
 use Carbon\Carbon;
@@ -53,7 +52,7 @@ class PasswordController extends Controller
                 ];
 
 //                ForgetPasswordJob::dispatch($mailData,$user)->delay(Carbon::now()->addSeconds(2));
-                Mail::to($user->email)->send(new ForgetPasswordMail($mailData));
+                //Mail::to($user->email)->send(new ForgetPasswordMail($mailData));
                 DeleteCodeJob::dispatch($user)->delay(Carbon::now()->addMinutes(6));
                 return $this->returnSuccessMessage(__('backend.operation completed successfully', [], app()->getLocale()));
             }
