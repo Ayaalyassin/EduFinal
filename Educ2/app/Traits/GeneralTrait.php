@@ -149,6 +149,11 @@ trait GeneralTrait
 
     public function send($user, $title, $message, $type = 'basic')
     {
+        Notification::create([
+            'title'=>$title,
+            'body'=>$message,
+            'user_id'=>$user['id'],
+        ]);
         $serviceAccountPath = storage_path('app/fcm.json');
 
         $factory = (new Factory)->withServiceAccount($serviceAccountPath);
@@ -174,11 +179,6 @@ trait GeneralTrait
         try {
             $messaging->send($cloudMessage);
 
-            Notification::create([
-                'title'=>$title,
-                'body'=>$message,
-                'user_id'=>$user['id'],
-            ]);
             return 1;
         } catch (\Kreait\Firebase\Exception\MessagingException $e) {
             Log::error($e->getMessage());

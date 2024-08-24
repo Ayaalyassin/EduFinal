@@ -480,6 +480,8 @@ Route::group(['middleware' => ['localization']], function () {
             Route::post('teachingMethods', [SearchController::class, 'teachingMethods']);
             Route::post('reports', [SearchController::class, 'reports']);
             Route::post('request_join', [SearchController::class, 'request_join']);
+            Route::post('getSeriesForTeachingA/{id}', [SearchController::class, 'getSeriesForTeachingA']);
+            Route::post('teachingMethodsSeries', [SearchController::class, 'teachingMethodsSeries']);
 
         });
     });

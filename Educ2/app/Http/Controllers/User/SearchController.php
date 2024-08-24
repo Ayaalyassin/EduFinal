@@ -283,5 +283,43 @@ class SearchController extends Controller
 
     }
 
+    public function teachingMethodsSeries(Request $request)
+    {
+        try {
+            $search=$request->search;
+
+            $teaching_methods = TeachingMethod::whereHas('series')->join('profile_teachers', 'teaching_methods.profile_teacher_id', '=', 'profile_teachers.id')
+                ->join('users', 'profile_teachers.user_id', '=', 'users.id')
+                ->select('teaching_methods.*', 'users.name')->orderBy('created_at', 'desc')
+                ->where('users.name', 'like', '%' . $search . '%')
+                ->orWhere('title', 'like', '%' . $search . '%')
+                ->orWhere('price','like', '%' . $search . '%')
+                ->get();
+
+            return $this->returnData($teaching_methods, __('backend.operation completed successfully', [], app()->getLocale()));
+        } catch (\Exception $ex) {
+            return $this->returnError("500", "Please try again later");
+        }
+    }
+
+    public function getSeriesForTeachingA($id,Request $request)
+    {
+        try {
+            $search=$request->search;
+
+            $teaching_method =TeachingMethod::find($id);
+            if(!$teaching_method)
+                return $this->returnError("404",'Not found');
+            $teaching_method->with('series',function($query) use($search){
+                $query->where('title','like', '%' . $search . '%');
+            });
+
+            return $this->returnData($teaching_method, __('backend.operation completed successfully', [], app()->getLocale()));
+
+        } catch (\Exception $ex) {
+            return $this->returnError("500", $ex->getMessage());
+        }
+    }
+
 
 }
